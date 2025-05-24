@@ -1,5 +1,6 @@
 package com.back.tradetier.model;
 
+import java.sql.Date;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -52,7 +53,7 @@ public class Advertisement {
     private Race race;
 
     @Column(name = "birthdate", nullable = false)
-    private LocalDate birthdate;
+    private Date birthdate;
 
     @Column(name = "gender", nullable = false)
     private String gender;
@@ -65,7 +66,7 @@ public class Advertisement {
     private Language language;
 
     @Column(name = "state", nullable = false)
-    private String state;
+    private Boolean state;
 
     @Column(name = "create_at", nullable = false, columnDefinition = "date DEFAULT 'now()'")
     @Builder.Default
