@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -14,9 +15,9 @@ import com.back.tradetier.dto.RaceDto;
 import com.back.tradetier.dto.UpdateRaceDto;
 import com.back.tradetier.service.RaceService;
 
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
 
 @RequestMapping("/api/v1/race")
 @RestController
@@ -36,7 +37,7 @@ public class RaceController {
     }
 
     @PostMapping()
-    public RaceController createRace(@RequestBody @Valid RaceDto race){
+    public RaceDto createRace(@RequestBody @Valid RaceDto race){
         return raceService.createRace(race);
     }
 

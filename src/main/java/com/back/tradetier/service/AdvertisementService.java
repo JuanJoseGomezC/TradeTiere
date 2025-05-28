@@ -6,12 +6,11 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.back.tradetier.config.security.JwtService;
+import com.back.tradetier.config.security.SecurityUtils;
 import com.back.tradetier.dto.AdvertisementDto;
 import com.back.tradetier.dto.UpdateAdvertisementDto;
 import com.back.tradetier.exceptions.ResourceNotFoundException;
@@ -34,6 +33,7 @@ public class AdvertisementService {
 
     private static final Logger log = LoggerFactory.getLogger(AdvertisementService.class);
 
+    private final SecurityUtils securityUtils;
     private final AdvertisementRepository advertisementRepository;
     private final JwtService jwtService;
     private final UserRepository userRepository;
@@ -111,7 +111,7 @@ public class AdvertisementService {
     }
 
     public Advertisement toAdvertisement(AdvertisementDto dto) {
-        User user = getCurrentUser();
+        User user = securityUtils.getCurrentUser();
         return Advertisement.builder()
                 .user(user)
                 .title(dto.getTitle())
@@ -149,13 +149,4 @@ public class AdvertisementService {
                 .build();
     }
 
-    private User getCurrentUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String token = authentication.getPrincipal().toString(); // Cambiado de getCredentials a getPrincipal
-        String mail = jwtService.extractMail(token);
-        log.debug("Extracting user with email: {}", mail);
-
-        return userRepository.findByMail(mail)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + mail));
-    }
 }

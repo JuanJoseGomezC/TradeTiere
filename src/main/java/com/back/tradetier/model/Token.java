@@ -36,10 +36,8 @@ public class Token {
 
     @Enumerated(EnumType.STRING)
     @Builder.Default
-    private TokenType tokenType = TokenType.BEARER;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    private TokenType tokenType = TokenType.BEARER;    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
 }

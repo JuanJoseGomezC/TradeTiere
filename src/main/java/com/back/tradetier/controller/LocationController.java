@@ -37,7 +37,7 @@ public class LocationController {
     }
 
     @PostMapping()
-    public LocationController createLocation(@RequestBody @Valid LocationDto location){
+    public LocationDto createLocation(@RequestBody @Valid LocationDto location){
         return locationService.createLocation(location);
     }
 

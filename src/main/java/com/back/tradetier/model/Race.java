@@ -8,13 +8,17 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity(name = "Race")
 @Table(name = "\"Race\"", schema = "public")
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Race {
 
     @Id
@@ -24,10 +28,12 @@ public class Race {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "specie_id", nullable = false)
-    private String specie_id;
 
     @ManyToOne
     @JoinColumn(name = "language_id", nullable = false)
     private Language language;
+
+    @ManyToOne
+    @JoinColumn(name = "specie_id", nullable = false)
+    private Specie specie;
 }
