@@ -1,7 +1,6 @@
 package com.back.tradetier.service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +38,7 @@ public class LanguageService {
         return languageRepository.findAll()
                 .stream()
                 .map(LanguageService::toDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**

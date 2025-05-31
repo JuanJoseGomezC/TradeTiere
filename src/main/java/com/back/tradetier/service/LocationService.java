@@ -6,12 +6,12 @@ import org.springframework.stereotype.Service;
 
 import com.back.tradetier.dto.LocationDto;
 import com.back.tradetier.dto.UpdateLocationDto;
-import com.back.tradetier.dto.UpdatePurchaseHistoryDto;
 import com.back.tradetier.model.Language;
 import com.back.tradetier.model.Location;
 import com.back.tradetier.repository.LanguageRepository;
 import com.back.tradetier.repository.LocationRepository;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -22,44 +22,64 @@ public class LocationService {
     public final LocationRepository locationRepository;
 
 
+    public LocationDto createLocation(LocationDto dto) {
+        Language language = languageRepository.findById(dto.getLanguage())
+            .orElseThrow(() -> new EntityNotFoundException("Language not found"));
+
+        Location location = Location.builder()
+            .name(dto.getName())
+            .language(language)
+            .build();
+
+        location = locationRepository.save(location);
+        return mapToDTO(location);
+    }
+
+    public LocationDto getById(Integer id) {
+        return locationRepository.findById(id)
+            .map(this::mapToDTO)
+            .orElseThrow(() -> new EntityNotFoundException("Location not found"));
+    }
+
     public List<LocationDto> getAll() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAll'");
+        return locationRepository.findAll().stream()
+            .map(this::mapToDTO)
+            .toList();
     }
 
-    public LocationDto getById() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getById'");
-    }
+    public UpdateLocationDto updateLocation(Integer id, UpdateLocationDto dto) {
+        Location existing = locationRepository.findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("Location not found"));
 
-    public LocationDto createLocation(LocationDto location) {
-        Language language = languageRepository.findById(location.getLanguage())
-                .orElseThrow(() -> new IllegalArgumentException("Language no encontrado"));
-        return toDto(locationRepository.save(toEntity(location, language)));
-    }
+        if (!existing.getLanguage().getId().equals(dto.getLanguage())) {
+            Language language = languageRepository.findById(dto.getLanguage())
+                .orElseThrow(() -> new EntityNotFoundException("Language not found"));
+            existing.setLanguage(language);
+        }
 
-    public UpdateLocationDto updateLocation(Integer id, UpdatePurchaseHistoryDto location) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateLocation'");
+        existing.setName(dto.getName());
+        Location updated = locationRepository.save(existing);
+        return mapToUpdateDTO(updated);
     }
 
     public void deleteLocation(Integer id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteLocation'");
+        locationRepository.deleteById(id);
     }
 
-        public static Location toEntity(LocationDto dto, Language language) {
-        return Location.builder()
-                .name(dto.getName())
-                .language(language)
-                .build();
+    private UpdateLocationDto mapToUpdateDTO(Location location) {
+        return UpdateLocationDto
+            .builder()
+            .name(location.getName())
+            .language(location.getLanguage().getId())
+            .build();
     }
 
-    public static LocationDto toDto(Location entity) {
-        return LocationDto.builder()
-                .id(entity.getId())
-                .name(entity.getName())
-                .language(entity.getLanguage().getId())
-                .build();
+    private LocationDto mapToDTO(Location location) {
+        return LocationDto
+            .builder()
+            .id(location.getId())
+            .name(location.getName())
+            .language(location.getLanguage().getId())
+            .build();
     }
 }

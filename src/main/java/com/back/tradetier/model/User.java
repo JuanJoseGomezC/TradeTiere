@@ -45,6 +45,7 @@ public class User {
 
     @Column(name = "password", nullable = false)
     private String password;    @Builder.Default
+
     @Column(name = "created_at", nullable = false)
     private LocalDate createdAt = ZonedDateTime.now(ZoneId.of("Europe/Madrid")).toLocalDate();
 

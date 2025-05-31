@@ -2,6 +2,7 @@ package com.back.tradetier.controller;
 
 import java.util.List;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,40 +27,36 @@ public class AdvertisementController {
     private final AdvertisementService advertisementService;
 
     @GetMapping()
-    public List<AdvertisementDto> getAll(){
-        return advertisementService.getAllAdvertisements();
-
-            // get all by location
-
-            // get all by specie
-
-            //  get all by race
-
-    };
+    public ResponseEntity<List<AdvertisementDto>> getAll(){
+        return ResponseEntity.ok(advertisementService.getAllAdvertisements());
+    }
 
     @GetMapping("/{id}")
-    public AdvertisementDto getById(@PathVariable Integer id){
-        return advertisementService.getAdvertisementById(id);
+    public ResponseEntity<AdvertisementDto> getById(@PathVariable Integer id){
+        return ResponseEntity.ok(advertisementService.getAdvertisementById(id));
     }
+
+    @GetMapping("/{email}")
+    public ResponseEntity<List<AdvertisementDto>> getAllByMail(@PathVariable String mail) {
+        return ResponseEntity.ok(advertisementService.getAllAdvertisementsByMail(mail));
+    }
+
 
     @PostMapping()
-    public AdvertisementDto createAdvertisement(@RequestBody @Valid AdvertisementDto advertisement){
-        return advertisementService.createAdvertisement(advertisement);
+    public ResponseEntity<AdvertisementDto> createAdvertisement(@RequestBody @Valid AdvertisementDto advertisement){
+        return ResponseEntity.ok(advertisementService.createAdvertisement(advertisement));
     }
 
-    @PutMapping()
-    public UpdateAdvertisementDto updateAdvertisement(@PathVariable Integer id, @RequestBody UpdateAdvertisementDto advertisement){
-        return advertisementService.updateAdvertisement(id, advertisement);
+    @PutMapping("/{id}")
+    public ResponseEntity<UpdateAdvertisementDto> updateAdvertisement(@PathVariable Integer id, @RequestBody UpdateAdvertisementDto advertisement){
+        return ResponseEntity.ok(advertisementService.updateAdvertisement(id, advertisement));
 
     }
 
     @DeleteMapping("/{id}")
-    public void deleteAdvertisement(@PathVariable Integer id){
+    public ResponseEntity<Void> deleteAdvertisement(@PathVariable Integer id){
         advertisementService.deleteAdvertisement(id);
+        return ResponseEntity.noContent().build();
     }
-
-    // get all by mail
-
-
 
 }

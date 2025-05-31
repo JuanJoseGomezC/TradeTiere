@@ -28,27 +28,28 @@ public class LanguageController {
     private final LanguageService languageService;
 
     @GetMapping()
-    public List<LanguageDto> getAll() {
-        return languageService.getAll();
+    public ResponseEntity<List<LanguageDto>> getAll() {
+        return ResponseEntity.ok(languageService.getAll());
     }
 
     @GetMapping("/{id}")
-    public LanguageDto getById(@PathVariable Integer id){
-        return languageService.getById(id);
+    public ResponseEntity<LanguageDto> getById(@PathVariable Integer id){
+        return ResponseEntity.ok(languageService.getById(id));
     }
 
-    @PostMapping("/create")
+    @PostMapping()
     public ResponseEntity<LanguageDto> createLanguage(@RequestBody @Valid LanguageDto language){
         return ResponseEntity.ok(languageService.createLanguage(language));
     }
 
-    @PutMapping()
-    public UpdateLanguageDto updateLanguage(@PathVariable Integer id, @RequestBody UpdateLanguageDto language){
-        return languageService.updateLanguage(id, language);
+    @PutMapping("/{id}")
+    public ResponseEntity<UpdateLanguageDto> updateLanguage(@PathVariable Integer id, @RequestBody UpdateLanguageDto language){
+        return ResponseEntity.ok(languageService.updateLanguage(id, language));
     }
 
     @DeleteMapping("/{id}")
-    public void deleteLanguage(@PathVariable Integer id){
+    public ResponseEntity<Void> deleteLanguage(@PathVariable Integer id){
         languageService.deleteLanguage(id);
+        return ResponseEntity.noContent().build();
     }
 }

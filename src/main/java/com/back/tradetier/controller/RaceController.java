@@ -2,6 +2,7 @@ package com.back.tradetier.controller;
 
 import java.util.List;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,27 +28,28 @@ public class RaceController {
     private final RaceService raceService;
 
         @GetMapping()
-    public List<RaceDto> getAll(){
-        return raceService.getAll();
+    public ResponseEntity<List<RaceDto>> getAll(){
+        return ResponseEntity.ok(raceService.getAll());
     }
 
     @GetMapping("/{id}")
-    public RaceDto getById(@PathVariable Integer id){
-        return raceService.getById();
+    public ResponseEntity<RaceDto> getById(@PathVariable Integer id){
+        return ResponseEntity.ok(raceService.getById(id));
     }
 
     @PostMapping()
-    public RaceDto createRace(@RequestBody @Valid RaceDto race){
-        return raceService.createRace(race);
+    public ResponseEntity<RaceDto> createRace(@RequestBody @Valid RaceDto race){
+        return ResponseEntity.ok(raceService.createRace(race));
     }
 
-    @PutMapping()
-    public UpdateRaceDto updateRace(@PathVariable Integer id, @RequestBody UpdateRaceDto race){
-        return raceService.updateRace(id, race);
+    @PutMapping({"/{id}"})
+    public ResponseEntity<UpdateRaceDto> updateRace(@PathVariable Integer id, @RequestBody UpdateRaceDto race){
+        return ResponseEntity.ok(raceService.updateRace(id, race));
     }
 
     @DeleteMapping("/{id}")
-    public void deleteRace(@PathVariable Integer id){
+    public ResponseEntity<Void> deleteRace(@PathVariable Integer id){
         raceService.deleteRace(id);
+        return ResponseEntity.noContent().build();
     }
 }

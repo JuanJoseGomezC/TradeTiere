@@ -2,6 +2,7 @@ package com.back.tradetier.controller;
 
 import java.util.List;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,23 +27,23 @@ public class SpecieController {
     private final SpecieService specieService;
 
         @GetMapping()
-    public List<SpecieDto> getAll(){
-        return specieService.getAll();
+    public ResponseEntity<List<SpecieDto>> getAll(){
+        return ResponseEntity.ok(specieService.getAll());
     }
 
     @GetMapping("/{id}")
-    public SpecieDto getById(@PathVariable Integer id){
-        return specieService.getById();
+    public ResponseEntity<SpecieDto> getById(@PathVariable Integer id){
+        return ResponseEntity.ok(specieService.getById(id));
     }
 
     @PostMapping()
-    public SpecieDto createSpecie(@RequestBody @Valid SpecieDto specie){
-        return specieService.createSpecie(specie);
+    public ResponseEntity<SpecieDto> createSpecie(@RequestBody @Valid SpecieDto specie){
+        return ResponseEntity.ok(specieService.createSpecie(specie));
     }
 
-    @PutMapping()
-    public UpdateSpecieDto updateSpecie(@PathVariable Integer id, @RequestBody UpdateSpecieDto specie){
-        return specieService.updateSpecie(id, specie);
+    @PutMapping("/{id}")
+    public ResponseEntity<UpdateSpecieDto> updateSpecie(@PathVariable Integer id, @RequestBody UpdateSpecieDto specie){
+        return ResponseEntity.ok(specieService.updateSpecie(id, specie));
     }
 
     @DeleteMapping("/{id}")

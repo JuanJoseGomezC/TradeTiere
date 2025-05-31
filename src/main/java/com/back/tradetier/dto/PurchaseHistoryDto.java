@@ -1,12 +1,14 @@
 package com.back.tradetier.dto;
 
-import java.sql.Date;
+import java.time.LocalDate;
 
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 public class PurchaseHistoryDto {
-    Date date;
     Integer buyer;
+    LocalDate date;
     Integer advertisement;
 }

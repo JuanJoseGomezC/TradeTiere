@@ -2,14 +2,10 @@ package com.back.tradetier.service;
 
 import java.sql.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.back.tradetier.config.security.JwtService;
 import com.back.tradetier.config.security.SecurityUtils;
 import com.back.tradetier.dto.AdvertisementDto;
 import com.back.tradetier.dto.UpdateAdvertisementDto;
@@ -21,29 +17,27 @@ import com.back.tradetier.model.Race;
 import com.back.tradetier.model.Specie;
 import com.back.tradetier.model.User;
 import com.back.tradetier.repository.AdvertisementRepository;
-import com.back.tradetier.repository.UserRepository;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class AdvertisementService {
-
-    private static final Logger log = LoggerFactory.getLogger(AdvertisementService.class);
 
     private final SecurityUtils securityUtils;
     private final AdvertisementRepository advertisementRepository;
-    private final JwtService jwtService;
-    private final UserRepository userRepository;
+
 
     @Transactional(readOnly = true)
     public List<AdvertisementDto> getAllAdvertisements() {
         log.info("Fetching all advertisements");
         return advertisementRepository.findAll().stream()
                 .map(this::toDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Transactional(readOnly = true)
@@ -52,6 +46,14 @@ public class AdvertisementService {
         return advertisementRepository.findById(id)
                 .map(this::toDto)
                 .orElseThrow(() -> new ResourceNotFoundException("Advertisement not found with id: " + id));
+    }
+
+    @Transactional(readOnly = true)
+    public List<AdvertisementDto> getAllAdvertisementsByMail(String mail) {
+        log.info("Fetching advertisements for user with email: {}", mail);
+        return advertisementRepository.findAllByUserMail(mail).stream()
+                .map(this::toDto)
+                .toList();
     }
 
     public AdvertisementDto createAdvertisement(@Valid AdvertisementDto advertisementDto) {

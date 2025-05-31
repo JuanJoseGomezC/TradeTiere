@@ -13,8 +13,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 
 // @Data es lo mismo que @Setters, @Getters, @ToString, @EqualsAndHashCode, @RequiredArgsConstructor
@@ -23,6 +25,8 @@ import lombok.Data;
 @Table(name = "\"Advertisement\"", schema = "public")
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Advertisement {
 
     @Id
@@ -66,8 +70,8 @@ public class Advertisement {
     @Column(name = "state", nullable = false)
     private Boolean state;
 
-    @Column(name = "create_at", nullable = false, columnDefinition = "date DEFAULT 'now()'")
     @Builder.Default
-    private LocalDate create_at = ZonedDateTime.now(ZoneId.of("Europe/Spain")).toLocalDate();
+    @Column(name = "created_at", nullable = false)
+    private LocalDate createdAt = ZonedDateTime.now(ZoneId.of("Europe/Madrid")).toLocalDate();
 
 }

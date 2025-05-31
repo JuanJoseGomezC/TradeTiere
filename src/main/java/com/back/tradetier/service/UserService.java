@@ -1,9 +1,7 @@
 package com.back.tradetier.service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-import org.apache.catalina.security.SecurityUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -54,7 +52,7 @@ public class UserService {
         return userRepository.findAll()
                 .stream()
                 .map(this::toDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -85,8 +83,8 @@ public class UserService {
         log.info("Updating user with email: {}", mail);
 
         User user = userRepository.findByMail(mail)
-            .orElseThrow(() -> new UserMailException());
-
+            .orElseThrow(UserMailException::new);
+            
         // Update only non-null fields
         if (updateDto.getName() != null) {
             user.setName(updateDto.getName());
