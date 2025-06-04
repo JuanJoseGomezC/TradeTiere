@@ -84,7 +84,7 @@ public class UserService {
 
         User user = userRepository.findByMail(mail)
             .orElseThrow(UserMailException::new);
-            
+
         // Update only non-null fields
         if (updateDto.getName() != null) {
             user.setName(updateDto.getName());

@@ -11,7 +11,9 @@ import org.springframework.web.server.ResponseStatusException;
 @ControllerAdvice
 public class GlobalExceptionHandler {
     
-    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);    @ExceptionHandler(UserLoginException.class)
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);    
+    
+    @ExceptionHandler(UserLoginException.class)
     public ResponseEntity<String> handleLoginException(ResponseStatusException ex){
         log.warn("Login error: {}", ex.getMessage());
         return new ResponseEntity<>(ex.getMessage(), ex.getStatusCode());
@@ -46,9 +48,26 @@ public class GlobalExceptionHandler {
         log.warn("Invalid token: {}", ex.getMessage());
         return new ResponseEntity<>(ex.getMessage(), ex.getStatusCode());
     }
+      @ExceptionHandler({
+        RaceNotFoundException.class,
+        SpecieNotFoundException.class,
+        LocationNotFoundException.class,
+        PurchaseHistoryNotFoundException.class,
+        LanguageNotFoundException.class,
+        AdvertisementNotFoundException.class
+    })
+    public ResponseEntity<String> handleEntityNotFound(ResponseStatusException ex) {
+        log.warn("Entity not found: {}", ex.getMessage());
+        return new ResponseEntity<>(ex.getMessage(), ex.getStatusCode());
+    }
 
 
-    // Para cualquier otra excepción no controlada
+    // Para cualquier otra excepción no controlada    @ExceptionHandler(jakarta.persistence.EntityNotFoundException.class)
+    public ResponseEntity<String> handleEntityNotFoundException(jakarta.persistence.EntityNotFoundException ex) {
+        log.warn("Entity not found: {}", ex.getMessage());
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleGenericException(Exception ex) {
         return new ResponseEntity<>("Error interno del servidor: " + ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

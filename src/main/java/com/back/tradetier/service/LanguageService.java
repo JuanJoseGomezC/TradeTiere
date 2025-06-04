@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.back.tradetier.dto.LanguageDto;
 import com.back.tradetier.dto.UpdateLanguageDto;
-import com.back.tradetier.exceptions.ResourceNotFoundException;
+import com.back.tradetier.exceptions.LanguageNotFoundException;
 import com.back.tradetier.model.Language;
 import com.back.tradetier.repository.LanguageRepository;
 
@@ -47,13 +47,12 @@ public class LanguageService {
      * @param id the language ID
      * @return the language DTO
      * @throws ResourceNotFoundException if the language is not found
-     */
-    @Transactional(readOnly = true)
+     */    @Transactional(readOnly = true)
     public LanguageDto getById(Integer id) {
         log.info("Getting language by id: {}", id);
         return languageRepository.findById(id)
             .map(LanguageService::toDto)
-            .orElseThrow(() -> new ResourceNotFoundException("Language not found with id: " + id));
+            .orElseThrow(() -> new LanguageNotFoundException("Lenguaje no encontrado con id: " + id));
     }
 
     /**
@@ -78,13 +77,12 @@ public class LanguageService {
      * @param updateLanguageDto the update data
      * @return the update data DTO
      * @throws ResourceNotFoundException if the language is not found
-     */
-    @Transactional
+     */    @Transactional
     public UpdateLanguageDto updateLanguage(Integer id, UpdateLanguageDto updateLanguageDto) {
         log.info("Updating language with id: {}", id);
 
         Language language = languageRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Language not found with id: " + id));
+            .orElseThrow(() -> new LanguageNotFoundException("Lenguaje no encontrado con id: " + id));
 
         // Update language name
         if (updateLanguageDto.getLanguage() != null) {
@@ -102,13 +100,12 @@ public class LanguageService {
      *
      * @param id the language ID
      * @throws ResourceNotFoundException if the language is not found
-     */
-    @Transactional
+     */    @Transactional
     public void deleteLanguage(Integer id) {
         log.info("Deleting language with id: {}", id);
 
         Language language = languageRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Language not found with id: " + id));
+            .orElseThrow(() -> new LanguageNotFoundException("Lenguaje no encontrado con id: " + id));
 
         languageRepository.delete(language);
         log.info("Language deleted successfully");

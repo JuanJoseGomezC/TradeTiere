@@ -13,13 +13,9 @@ import com.back.tradetier.model.PurchaseHistoryId;
 @Repository
 public interface PurchaseHistoryRepository extends JpaRepository<PurchaseHistory, PurchaseHistoryId>{
 
-@Query(value = """
-    SELECT ph.*
-    FROM "PurchaseHistory" ph
-    JOIN "User" u ON ph.user_buy_id = u.id
-    WHERE u.mail = :mail
-    """, nativeQuery = true)
-List<PurchaseHistory> findPurchaseHistoryByUserMail(@Param("mail") String mail);
-
-
+    @Query("SELECT ph FROM PurchaseHistory ph " +
+           "JOIN FETCH ph.id.buyer " +
+           "JOIN FETCH ph.id.advertisement " +
+           "WHERE ph.id.buyer.mail = :email")
+    List<PurchaseHistory> findPurchaseHistoryByUserEmail(@Param("email") String email);
 }

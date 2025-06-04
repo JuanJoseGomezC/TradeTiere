@@ -6,12 +6,13 @@ import org.springframework.stereotype.Service;
 
 import com.back.tradetier.dto.LocationDto;
 import com.back.tradetier.dto.UpdateLocationDto;
+import com.back.tradetier.exceptions.LanguageNotFoundException;
+import com.back.tradetier.exceptions.LocationNotFoundException;
 import com.back.tradetier.model.Language;
 import com.back.tradetier.model.Location;
 import com.back.tradetier.repository.LanguageRepository;
 import com.back.tradetier.repository.LocationRepository;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -24,7 +25,7 @@ public class LocationService {
 
     public LocationDto createLocation(LocationDto dto) {
         Language language = languageRepository.findById(dto.getLanguage())
-            .orElseThrow(() -> new EntityNotFoundException("Language not found"));
+            .orElseThrow(() -> new LanguageNotFoundException("Lenguaje no encontrado con ID: " + dto.getLanguage()));
 
         Location location = Location.builder()
             .name(dto.getName())
@@ -38,7 +39,7 @@ public class LocationService {
     public LocationDto getById(Integer id) {
         return locationRepository.findById(id)
             .map(this::mapToDTO)
-            .orElseThrow(() -> new EntityNotFoundException("Location not found"));
+            .orElseThrow(() -> new LocationNotFoundException("Ubicación no encontrada con ID: " + id));
     }
 
     public List<LocationDto> getAll() {
@@ -49,11 +50,11 @@ public class LocationService {
 
     public UpdateLocationDto updateLocation(Integer id, UpdateLocationDto dto) {
         Location existing = locationRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Location not found"));
+            .orElseThrow(() -> new LocationNotFoundException("Ubicación no encontrada con ID: " + id));
 
         if (!existing.getLanguage().getId().equals(dto.getLanguage())) {
             Language language = languageRepository.findById(dto.getLanguage())
-                .orElseThrow(() -> new EntityNotFoundException("Language not found"));
+                .orElseThrow(() -> new LanguageNotFoundException("Lenguaje no encontrado con ID: " + dto.getLanguage()));
             existing.setLanguage(language);
         }
 
@@ -63,6 +64,9 @@ public class LocationService {
     }
 
     public void deleteLocation(Integer id) {
+        if (!locationRepository.existsById(id)) {
+            throw new LocationNotFoundException("Ubicación no encontrada con ID: " + id);
+        }
         locationRepository.deleteById(id);
     }
 

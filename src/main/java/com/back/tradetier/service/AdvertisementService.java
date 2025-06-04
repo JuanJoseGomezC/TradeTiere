@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.back.tradetier.config.security.SecurityUtils;
 import com.back.tradetier.dto.AdvertisementDto;
 import com.back.tradetier.dto.UpdateAdvertisementDto;
+import com.back.tradetier.exceptions.AdvertisementNotFoundException;
 import com.back.tradetier.exceptions.ResourceNotFoundException;
 import com.back.tradetier.model.Advertisement;
 import com.back.tradetier.model.Language;
@@ -38,14 +39,12 @@ public class AdvertisementService {
         return advertisementRepository.findAll().stream()
                 .map(this::toDto)
                 .toList();
-    }
-
-    @Transactional(readOnly = true)
+    }    @Transactional(readOnly = true)
     public AdvertisementDto getAdvertisementById(Integer id) {
         log.info("Fetching advertisement with id: {}", id);
         return advertisementRepository.findById(id)
                 .map(this::toDto)
-                .orElseThrow(() -> new ResourceNotFoundException("Advertisement not found with id: " + id));
+                .orElseThrow(() -> new AdvertisementNotFoundException("Anuncio no encontrado con id: " + id));
     }
 
     @Transactional(readOnly = true)
@@ -62,20 +61,16 @@ public class AdvertisementService {
         Advertisement savedAdvertisement = advertisementRepository.save(advertisement);
         log.info("Advertisement saved successfully with id: {}", savedAdvertisement.getId());
         return toDto(savedAdvertisement);
-    }
-
-    public void deleteAdvertisement(Integer id) {
+    }    public void deleteAdvertisement(Integer id) {
         log.info("Deleting advertisement with id: {}", id);
         Advertisement advertisement = advertisementRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Advertisement not found with id: " + id));
+                .orElseThrow(() -> new AdvertisementNotFoundException("Anuncio no encontrado con id: " + id));
         advertisementRepository.delete(advertisement);
         log.info("Advertisement deleted successfully");
-    }
-
-    public UpdateAdvertisementDto updateAdvertisement(Integer id, @Valid UpdateAdvertisementDto updateDto) {
+    }    public UpdateAdvertisementDto updateAdvertisement(Integer id, @Valid UpdateAdvertisementDto updateDto) {
         log.info("Updating advertisement with id: {}", id);
         Advertisement existingAdvertisement = advertisementRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Advertisement not found with id: " + id));
+                .orElseThrow(() -> new AdvertisementNotFoundException("Anuncio no encontrado con id: " + id));
 
         // Update only non-null fields
         if (updateDto.getTitle() != null) {

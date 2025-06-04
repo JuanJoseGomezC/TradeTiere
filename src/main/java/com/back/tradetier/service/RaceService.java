@@ -6,6 +6,9 @@ import org.springframework.stereotype.Service;
 
 import com.back.tradetier.dto.RaceDto;
 import com.back.tradetier.dto.UpdateRaceDto;
+import com.back.tradetier.exceptions.LanguageNotFoundException;
+import com.back.tradetier.exceptions.RaceNotFoundException;
+import com.back.tradetier.exceptions.SpecieNotFoundException;
 import com.back.tradetier.model.Language;
 import com.back.tradetier.model.Race;
 import com.back.tradetier.model.Specie;
@@ -31,46 +34,41 @@ public class RaceService {
                 .stream()
                 .map(this::toDto)
                 .toList();
-    }
-
-    public RaceDto getById(Integer id) {
+    }    public RaceDto getById(Integer id) {
         return raceRepository.findById(id)
                 .map(this::toDto)
-                .orElseThrow(() -> new IllegalArgumentException("Raza no encontrada con id: " + id));
-    }
-
-    public RaceDto createRace(RaceDto race) {
+                .orElseThrow(() -> new RaceNotFoundException("Raza no encontrada con id: " + id));
+    }    public RaceDto createRace(RaceDto race) {
         Specie specie = specieRepository.findById(race.getSpecie())
-                .orElseThrow(() -> new IllegalArgumentException("Especie no encontrada"));
+                .orElseThrow(() -> new SpecieNotFoundException("Especie no encontrada con ID: " + race.getSpecie()));
         Language language = languageRepository.findById(race.getLanguage())
-                .orElseThrow(() -> new IllegalArgumentException("Lenguaje no encontrado"));
+                .orElseThrow(() -> new LanguageNotFoundException("Lenguaje no encontrado con ID: " + race.getLanguage()));
 
         return toDto(raceRepository.save(toEntity(race, specie, language)));
-    }
-
-    public UpdateRaceDto updateRace(Integer id, UpdateRaceDto race) {
+    }    public UpdateRaceDto updateRace(Integer id, UpdateRaceDto race) {
         Race existingRace = raceRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Raza no encontrada con id: " + id));
+                .orElseThrow(() -> new RaceNotFoundException("Raza no encontrada con id: " + id));
 
             existingRace.setName(race.getName());
 
         if(!race.getLanguage().equals(existingRace.getLanguage().getId())) {
             Language language = languageRepository.findById(race.getLanguage())
-                    .orElseThrow(() -> new IllegalArgumentException("Lenguaje no encontrado"));
+                    .orElseThrow(() -> new LanguageNotFoundException("Lenguaje no encontrado con ID: " + race.getLanguage()));
             existingRace.setLanguage(language);
         }
 
         if(!race.getSpecie().equals(existingRace.getSpecie().getId())) {
             Specie specie = specieRepository.findById(race.getSpecie())
-                    .orElseThrow(() -> new IllegalArgumentException("Especie no encontrada"));
+                    .orElseThrow(() -> new SpecieNotFoundException("Especie no encontrada con ID: " + race.getSpecie()));
             existingRace.setSpecie(specie);
         }
         
         return toUpdateDto(raceRepository.save(existingRace));
     }
-
-
     public void deleteRace(Integer id) {
+        if (!raceRepository.existsById(id)) {
+            throw new RaceNotFoundException("Raza no encontrada con id: " + id);
+        }
         raceRepository.deleteById(id);
     }
     public Race toEntity(RaceDto race, Specie specie, Language language) {

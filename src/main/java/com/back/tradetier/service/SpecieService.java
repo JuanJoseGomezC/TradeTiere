@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 
 import com.back.tradetier.dto.SpecieDto;
 import com.back.tradetier.dto.UpdateSpecieDto;
+import com.back.tradetier.exceptions.LanguageNotFoundException;
+import com.back.tradetier.exceptions.SpecieNotFoundException;
 import com.back.tradetier.model.Language;
 import com.back.tradetier.model.Specie;
 import com.back.tradetier.repository.LanguageRepository;
@@ -24,40 +26,32 @@ public class SpecieService {
                 .stream()
                 .map(this::toDto)
                 .toList();
-    }
-
-    public SpecieDto getById(Integer id) {
+    }    public SpecieDto getById(Integer id) {
         return specieRepository.findById(id)
                 .map(this::toDto)
-                .orElseThrow(() -> new IllegalArgumentException("Especie no encontrada con ID: " + id));
+                .orElseThrow(() -> new SpecieNotFoundException("Especie no encontrada con ID: " + id));
 
-    }
-
-    public SpecieDto createSpecie(SpecieDto specie) {
+    }    public SpecieDto createSpecie(SpecieDto specie) {
         Language language = languageRepository.findById(specie.getLanguage())
-                .orElseThrow(() -> new IllegalArgumentException("Language no encontrado con ID: " + specie.getLanguage()));
+                .orElseThrow(() -> new LanguageNotFoundException("Language no encontrado con ID: " + specie.getLanguage()));
         return toDto(specieRepository.save(toEntity(specie, language)));
 
-    }
-
-    public UpdateSpecieDto updateSpecie(Integer id, UpdateSpecieDto specie) {
+    }    public UpdateSpecieDto updateSpecie(Integer id, UpdateSpecieDto specie) {
         Specie existingSpecie = specieRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Especie no encontrada con ID: " + id));
+                .orElseThrow(() -> new SpecieNotFoundException("Especie no encontrada con ID: " + id));
 
         existingSpecie.setName(specie.getName());
 
         if (!specie.getLanguage().equals(existingSpecie.getLanguage().getId())) {
             Language language = languageRepository.findById(specie.getLanguage())
-                    .orElseThrow(() -> new IllegalArgumentException("Language no encontrado con ID: " + specie.getLanguage()));
+                    .orElseThrow(() -> new LanguageNotFoundException("Language no encontrado con ID: " + specie.getLanguage()));
             existingSpecie.setLanguage(language);
         }
 
         return toUpdateDto(specieRepository.save(existingSpecie));
-    }
-
-    public void deleteSpecie(Integer id) {
+    }    public void deleteSpecie(Integer id) {
         if (!specieRepository.existsById(id)) {
-            throw new IllegalArgumentException("Especie no encontrada con ID: " + id);
+            throw new SpecieNotFoundException("Especie no encontrada con ID: " + id);
         }
         specieRepository.deleteById(id);
     }
