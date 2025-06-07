@@ -36,7 +36,7 @@ public class AdvertisementController {
         return ResponseEntity.ok(advertisementService.getAdvertisementById(id));
     }
 
-    @GetMapping("/{email}")
+    @GetMapping("/{mail}")
     public ResponseEntity<List<AdvertisementDto>> getAllByMail(@PathVariable String mail) {
         return ResponseEntity.ok(advertisementService.getAllAdvertisementsByMail(mail));
     }

@@ -22,4 +22,5 @@ public class AdvertisementDto {
     Integer specie;
     Boolean state;
     LocalDate create_at;
+    ImageDto image;
 }

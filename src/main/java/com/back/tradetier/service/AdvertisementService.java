@@ -1,6 +1,7 @@
 package com.back.tradetier.service;
 
 import java.sql.Date;
+import java.util.Base64;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -8,16 +9,18 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.back.tradetier.config.security.SecurityUtils;
 import com.back.tradetier.dto.AdvertisementDto;
+import com.back.tradetier.dto.ImageDto;
 import com.back.tradetier.dto.UpdateAdvertisementDto;
 import com.back.tradetier.exceptions.AdvertisementNotFoundException;
-import com.back.tradetier.exceptions.ResourceNotFoundException;
 import com.back.tradetier.model.Advertisement;
+import com.back.tradetier.model.Image;
 import com.back.tradetier.model.Language;
 import com.back.tradetier.model.Location;
 import com.back.tradetier.model.Race;
 import com.back.tradetier.model.Specie;
 import com.back.tradetier.model.User;
 import com.back.tradetier.repository.AdvertisementRepository;
+import com.back.tradetier.repository.ImageRepository;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +34,9 @@ public class AdvertisementService {
 
     private final SecurityUtils securityUtils;
     private final AdvertisementRepository advertisementRepository;
+    private final ImageRepository imageRepository;
 
+    static final String AD_NOT_FOUND = "Anuncio no encontrado con id: ";
 
     @Transactional(readOnly = true)
     public List<AdvertisementDto> getAllAdvertisements() {
@@ -39,12 +44,14 @@ public class AdvertisementService {
         return advertisementRepository.findAll().stream()
                 .map(this::toDto)
                 .toList();
-    }    @Transactional(readOnly = true)
+    }
+
+    @Transactional(readOnly = true)
     public AdvertisementDto getAdvertisementById(Integer id) {
         log.info("Fetching advertisement with id: {}", id);
         return advertisementRepository.findById(id)
                 .map(this::toDto)
-                .orElseThrow(() -> new AdvertisementNotFoundException("Anuncio no encontrado con id: " + id));
+                .orElseThrow(() -> new AdvertisementNotFoundException(AD_NOT_FOUND + id));
     }
 
     @Transactional(readOnly = true)
@@ -57,20 +64,26 @@ public class AdvertisementService {
 
     public AdvertisementDto createAdvertisement(@Valid AdvertisementDto advertisementDto) {
         log.info("Creating new advertisement: {}", advertisementDto.getTitle());
+
         Advertisement advertisement = toAdvertisement(advertisementDto);
         Advertisement savedAdvertisement = advertisementRepository.save(advertisement);
+
         log.info("Advertisement saved successfully with id: {}", savedAdvertisement.getId());
         return toDto(savedAdvertisement);
-    }    public void deleteAdvertisement(Integer id) {
+    }
+
+    public void deleteAdvertisement(Integer id) {
         log.info("Deleting advertisement with id: {}", id);
         Advertisement advertisement = advertisementRepository.findById(id)
-                .orElseThrow(() -> new AdvertisementNotFoundException("Anuncio no encontrado con id: " + id));
+                .orElseThrow(() -> new AdvertisementNotFoundException(AD_NOT_FOUND + id));
         advertisementRepository.delete(advertisement);
         log.info("Advertisement deleted successfully");
-    }    public UpdateAdvertisementDto updateAdvertisement(Integer id, @Valid UpdateAdvertisementDto updateDto) {
+    }
+
+    public UpdateAdvertisementDto updateAdvertisement(Integer id, @Valid UpdateAdvertisementDto updateDto) {
         log.info("Updating advertisement with id: {}", id);
         Advertisement existingAdvertisement = advertisementRepository.findById(id)
-                .orElseThrow(() -> new AdvertisementNotFoundException("Anuncio no encontrado con id: " + id));
+                .orElseThrow(() -> new AdvertisementNotFoundException(AD_NOT_FOUND + id));
 
         // Update only non-null fields
         if (updateDto.getTitle() != null) {
@@ -109,6 +122,18 @@ public class AdvertisementService {
 
     public Advertisement toAdvertisement(AdvertisementDto dto) {
         User user = securityUtils.getCurrentUser();
+        Image image = null;
+        if (dto.getImage().getImageBase64() != null &&
+                !dto.getImage().getImageBase64().isEmpty()) {
+            // Convertir la cadena Base64 a bytes
+            byte[] imageData = Base64.getDecoder().decode(dto.getImage().getImageBase64());
+
+            image = Image.builder()
+                    .imageData(imageData)
+                    .name(dto.getImage().getName())
+                    .contentType(dto.getImage().getContentType())
+                    .build();
+        }
         return Advertisement.builder()
                 .user(user)
                 .title(dto.getTitle())
@@ -122,17 +147,26 @@ public class AdvertisementService {
                 .race(Race.builder()
                         .id(dto.getRace())
                         .build())
-                .birthdate(dto.getBirthdate()) // Ya es java.sql.Date
+                .birthdate(dto.getBirthdate())
                 .language(Language.builder()
                         .id(dto.getLanguage())
                         .build())
-                .gender(dto.getGender())
+                .image(image)
                 .price(dto.getPrice())
                 .state(true)
+                .gender(dto.getGender())
                 .build();
     }
 
     public AdvertisementDto toDto(Advertisement advertisement) {
+        ImageDto imageDto = ImageDto.builder()
+                .imageBase64(advertisement.getImage() != null
+                        ? java.util.Base64.getEncoder().encodeToString(advertisement.getImage().getImageData())
+                        : null)
+                .name(advertisement.getImage() != null ? advertisement.getImage().getName() : null)
+                .contentType(advertisement.getImage() != null ? advertisement.getImage().getContentType() : null)
+                .build();
+
         return AdvertisementDto.builder()
                 .title(advertisement.getTitle())
                 .description(advertisement.getDescription())
@@ -143,6 +177,7 @@ public class AdvertisementService {
                 .language(advertisement.getLanguage() != null ? advertisement.getLanguage().getId() : null)
                 .gender(advertisement.getGender())
                 .price(advertisement.getPrice())
+                .image(imageDto)
                 .build();
     }
 

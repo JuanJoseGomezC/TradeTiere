@@ -85,6 +85,10 @@ public class UserService {
         User user = userRepository.findByMail(mail)
             .orElseThrow(UserMailException::new);
 
+
+        // Validate update fields
+        validateRegisterFields(updateDto);
+
         // Update only non-null fields
         if (updateDto.getName() != null) {
             user.setName(updateDto.getName());
@@ -94,11 +98,9 @@ public class UserService {
             user.setLastname(updateDto.getLastname());
         }
 
-        if (updateDto.getBirthday() != null) {
-            user.setBirthdate(updateDto.getBirthday().toLocalDate());
-        }
 
         if (updateDto.getPassword() != null && !updateDto.getPassword().trim().isEmpty()) {
+
             user.setPassword(passwordEncoder.encode(updateDto.getPassword()));
         }
 
@@ -160,6 +162,8 @@ public class UserService {
         userRepository.findByMail(registerDto.getMail())
             .ifPresent(user -> { throw new UserExistException(); });
 
+        validateRegisterFields(registerDto);
+        log.info("Registering new user: {}", registerDto.getMail());
         User user = toUser(registerDto, passwordEncoder);
 
         userRepository.save(user);
@@ -188,6 +192,43 @@ public class UserService {
                 .build();
     }
 
+    //Validar campos de registro
+    /**
+     * Validate registration fields.
+     *
+     * @param registerDto the registration data
+     * @throws InvalidTokenException if validation fails
+     */
+    public void validateRegisterFields(RegisterDto registerDto) {
+        
+            if (!registerDto.getMail().matches("^[\\w-\\.]+@[\\w-]+\\.[a-zA-Z]{2,}$")) {
+                throw new InvalidTokenException("Invalid email format");
+            }
+            if (registerDto.getBirthdate().isAfter(java.time.LocalDate.now().minusYears(18))) {
+                throw new InvalidTokenException("You must be at least 18 years old to update your profile");
+            }
+            if (registerDto.getPassword().length() < 8) {
+                throw new InvalidTokenException("Password must be at least 8 characters long");
+            }
+            if (!registerDto.getPassword().matches(".*[A-Z].*") || !registerDto.getPassword().matches(".*[a-z].*")
+                    || !registerDto.getPassword().matches(".*\\d.*")) {
+                throw new InvalidTokenException("Password must contain at least one uppercase letter, one lowercase letter, and one digit");
+            }
+    }
+    public void validateRegisterFields(UpdateUserDto updateUserDto) {
+
+            if (updateUserDto.getBirthday().toLocalDate().isAfter(java.time.LocalDate.now().minusYears(18))) {
+                throw new InvalidTokenException("You must be at least 18 years old to update your profile");
+            }
+
+            if (updateUserDto.getPassword().length() < 8) {
+                throw new InvalidTokenException("Password must be at least 8 characters long");
+            }
+            if (!updateUserDto.getPassword().matches(".*[A-Z].*") || !updateUserDto.getPassword().matches(".*[a-z].*")
+                    || !updateUserDto.getPassword().matches(".*\\d.*")) {
+                throw new InvalidTokenException("Password must contain at least one uppercase letter, one lowercase letter, and one digit");
+            }
+    }
     /**
      * Get a user by email.
      *

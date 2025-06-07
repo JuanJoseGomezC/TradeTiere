@@ -20,6 +20,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 
+
 @RequestMapping("/api/v1/race")
 @RestController
 @RequiredArgsConstructor
@@ -37,6 +38,11 @@ public class RaceController {
         return ResponseEntity.ok(raceService.getById(id));
     }
 
+    @GetMapping("/specie/{specieId}")
+    public  ResponseEntity<List<RaceDto>> getRacesFromSpecie(@PathVariable Integer specieId){
+        return ResponseEntity.ok(raceService.getRacesFromSpecie(specieId));
+    }
+    
     @PostMapping()
     public ResponseEntity<RaceDto> createRace(@RequestBody @Valid RaceDto race){
         return ResponseEntity.ok(raceService.createRace(race));
