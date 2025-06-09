@@ -20,6 +20,6 @@ public class PurchaseHistoryId {
     private User buyer;
 
     @ManyToOne
-    @JoinColumn(name = "advertisement_id", nullable = false)
-    private Advertisement advertisement;
+    @JoinColumn(name = "advertisment_id", nullable = false)
+    private Advertisment advertisment;
 }

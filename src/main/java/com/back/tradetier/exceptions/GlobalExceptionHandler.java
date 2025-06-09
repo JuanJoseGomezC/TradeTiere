@@ -54,7 +54,7 @@ public class GlobalExceptionHandler {
         LocationNotFoundException.class,
         PurchaseHistoryNotFoundException.class,
         LanguageNotFoundException.class,
-        AdvertisementNotFoundException.class
+        AdvertismentNotFoundException.class
     })
     public ResponseEntity<String> handleEntityNotFound(ResponseStatusException ex) {
         log.warn("Entity not found: {}", ex.getMessage());

@@ -7,16 +7,16 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.back.tradetier.model.Advertisement;
+import com.back.tradetier.model.Advertisment;
 
 @Repository
-public interface AdvertisementRepository extends JpaRepository<Advertisement, Integer>{
+public interface AdvertismentRepository extends JpaRepository<Advertisment, Integer>{
 
     /**
      * Encuentra todos los anuncios de un usuario por su email
      * @param mail el email del usuario
      * @return lista de anuncios
      */
-    @Query("SELECT a FROM Advertisement a WHERE a.user.mail = :mail")
-    List<Advertisement> findAllByUserMail(@Param("mail") String mail);
+    @Query("SELECT a FROM Advertisment a WHERE a.user.mail = :mail")
+    List<Advertisment> findAllByUserMail(@Param("mail") String mail);
 }

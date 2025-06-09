@@ -39,6 +39,11 @@ public class UserController {
         return ResponseEntity.ok(userService.getById(id));
     }
 
+    @GetMapping("/me")
+    public ResponseEntity<UserDto> getCurrentUser() {
+        return ResponseEntity.ok(userService.getCurrentUser());
+    }
+
     @PutMapping("/updateProfile")
     public ResponseEntity<UpdateUserDto> updateCurrentUser(@Valid @RequestBody UpdateUserDto user) {
         log.info("Request to update current user profile");

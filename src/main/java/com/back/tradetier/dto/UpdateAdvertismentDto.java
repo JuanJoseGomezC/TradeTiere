@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UpdateAdvertisementDto {
+public class UpdateAdvertismentDto {
     @Size(min = 3, max = 100, message = "Title must be between 3 and 100 characters")
     private String title;
 

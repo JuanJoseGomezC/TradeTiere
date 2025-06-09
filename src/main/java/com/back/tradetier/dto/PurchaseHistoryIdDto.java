@@ -8,5 +8,5 @@ import lombok.Data;
 public class PurchaseHistoryIdDto {
 
     private Integer buyerId;
-    private Integer advertisementId;
+    private Integer advertismentId;
 }

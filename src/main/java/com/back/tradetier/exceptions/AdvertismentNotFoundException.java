@@ -4,15 +4,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 /**
- * Exception thrown when a requested advertisement is not found.
+ * Exception thrown when a requested advertisment is not found.
  */
-public class AdvertisementNotFoundException extends ResponseStatusException {
+public class AdvertismentNotFoundException extends ResponseStatusException {
 
-    public AdvertisementNotFoundException() {
+    public AdvertismentNotFoundException() {
         super(HttpStatus.NOT_FOUND, "Anuncio no encontrado");
     }
 
-    public AdvertisementNotFoundException(String message) {
+    public AdvertismentNotFoundException(String message) {
         super(HttpStatus.NOT_FOUND, message);
     }
 }

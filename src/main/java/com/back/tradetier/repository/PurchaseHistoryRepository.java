@@ -15,7 +15,7 @@ public interface PurchaseHistoryRepository extends JpaRepository<PurchaseHistory
 
     @Query("SELECT ph FROM PurchaseHistory ph " +
            "JOIN FETCH ph.id.buyer " +
-           "JOIN FETCH ph.id.advertisement " +
+           "JOIN FETCH ph.id.advertisment " +
            "WHERE ph.id.buyer.mail = :email")
     List<PurchaseHistory> findPurchaseHistoryByUserEmail(@Param("email") String email);
 }

@@ -10,7 +10,7 @@ import lombok.Data;
 @Builder
 @Data
 @AllArgsConstructor
-public class AdvertisementDto {
+public class AdvertismentDto {
     String title;
     String description;
     Integer location;

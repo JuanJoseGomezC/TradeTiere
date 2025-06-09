@@ -11,11 +11,11 @@ import com.back.tradetier.dto.PurchaseHistoryIdDto;
 import com.back.tradetier.exceptions.PurchaseHistoryNotFoundException;
 import com.back.tradetier.exceptions.ResourceNotFoundException;
 import com.back.tradetier.exceptions.UnauthorizedAccessException;
-import com.back.tradetier.model.Advertisement;
+import com.back.tradetier.model.Advertisment;
 import com.back.tradetier.model.PurchaseHistory;
 import com.back.tradetier.model.PurchaseHistoryId;
 import com.back.tradetier.model.User;
-import com.back.tradetier.repository.AdvertisementRepository;
+import com.back.tradetier.repository.AdvertismentRepository;
 import com.back.tradetier.repository.PurchaseHistoryRepository;
 import com.back.tradetier.repository.UserRepository;
 
@@ -27,7 +27,7 @@ public class PurchaseHistoryService {
 
     private final PurchaseHistoryRepository purchaseHistoryRepository;
     private final UserRepository userRepository;
-    private final AdvertisementRepository advertisementRepository;
+    private final AdvertismentRepository advertismentRepository;
     private final SecurityUtils securityUtils;
 
 
@@ -48,12 +48,12 @@ public class PurchaseHistoryService {
         User buyer = userRepository.findById(dto.getBuyer())
             .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con ID: " + dto.getBuyer()));
 
-        Advertisement advertisement = advertisementRepository.findById(dto.getAdvertisement())
-            .orElseThrow(() -> new ResourceNotFoundException("Anuncio no encontrado con ID: " + dto.getAdvertisement()));
+        Advertisment advertisment = advertismentRepository.findById(dto.getAdvertisment())
+            .orElseThrow(() -> new ResourceNotFoundException("Anuncio no encontrado con ID: " + dto.getAdvertisment()));
 
         PurchaseHistoryId id = PurchaseHistoryId.builder()
             .buyer(buyer)
-            .advertisement(advertisement)
+            .advertisment(advertisment)
             .build();
 
         PurchaseHistory purchaseHistory = PurchaseHistory.builder()
@@ -81,12 +81,12 @@ public class PurchaseHistoryService {
         User buyer = userRepository.findById(dto.getBuyerId())
             .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con ID: " + dto.getBuyerId()));
 
-        Advertisement advertisement = advertisementRepository.findById(dto.getAdvertisementId())
-            .orElseThrow(() -> new ResourceNotFoundException("Anuncio no encontrado con ID: " + dto.getAdvertisementId()));
+        Advertisment advertisment = advertismentRepository.findById(dto.getAdvertismentId())
+            .orElseThrow(() -> new ResourceNotFoundException("Anuncio no encontrado con ID: " + dto.getAdvertismentId()));
 
         return PurchaseHistoryId.builder()
             .buyer(buyer)
-            .advertisement(advertisement)
+            .advertisment(advertisment)
             .build();
     }
 
@@ -94,7 +94,7 @@ public class PurchaseHistoryService {
         return PurchaseHistoryDto.builder()
             .buyer(purchaseHistory.getId().getBuyer().getId())
             .date(purchaseHistory.getDate())
-            .advertisement(purchaseHistory.getId().getAdvertisement().getId())
+            .advertisment(purchaseHistory.getId().getAdvertisment().getId())
             .build();
     }
 }

@@ -23,13 +23,13 @@ import lombok.NoArgsConstructor;
 
 // @Data es lo mismo que @Setters, @Getters, @ToString, @EqualsAndHashCode, @RequiredArgsConstructor
 // @Builder utiliza el patron de diseño builder, creando una clase interna build a la que le das los atributos a la hora de hacer el constructor
-@Entity(name = "Advertisement")
-@Table(name = "\"Advertisement\"", schema = "public")
+@Entity(name = "Advertisment")
+@Table(name = "\"Advertisment\"", schema = "public")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Advertisement {
+public class Advertisment {
 
     @Id
     @Column(name = "id")

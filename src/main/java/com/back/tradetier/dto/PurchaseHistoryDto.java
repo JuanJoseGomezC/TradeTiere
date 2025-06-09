@@ -10,5 +10,5 @@ import lombok.Data;
 public class PurchaseHistoryDto {
     Integer buyer;
     LocalDate date;
-    Integer advertisement;
+    Integer advertisment;
 }

@@ -66,15 +66,17 @@ public class UserService {
     public UserDto getById(Integer id) {
         log.info("Getting user by id: {}", id);
         return userRepository.findById(id)
-            .map(this::toDto)
-            .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
-    }    /**
+                .map(this::toDto)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+    }
+
+    /**
      * Update the current user based on the JWT token.
      *
      * @param updateDto the update data
      * @return the updated user DTO
      * @throws ResourceNotFoundException if the user is not found
-     * @throws InvalidTokenException if the token is invalid
+     * @throws InvalidTokenException     if the token is invalid
      */
     @Transactional
     public UpdateUserDto updateUser(UpdateUserDto updateDto) {
@@ -83,8 +85,7 @@ public class UserService {
         log.info("Updating user with email: {}", mail);
 
         User user = userRepository.findByMail(mail)
-            .orElseThrow(UserMailException::new);
-
+                .orElseThrow(UserMailException::new);
 
         // Validate update fields
         validateRegisterFields(updateDto);
@@ -98,12 +99,10 @@ public class UserService {
             user.setLastname(updateDto.getLastname());
         }
 
-
-        if (updateDto.getPassword() != null && !updateDto.getPassword().trim().isEmpty()) {
-
+        // si la contraseña esta vacía, no la actualiza
+        if (updateDto.getPassword() != null && !updateDto.getPassword().isEmpty()) {
             user.setPassword(passwordEncoder.encode(updateDto.getPassword()));
         }
-
         userRepository.save(user);
         log.info("User updated successfully");
 
@@ -125,7 +124,7 @@ public class UserService {
         log.info("Deleting user with id: {}", mail);
 
         User user = userRepository.findByMail(mail)
-            .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + mail));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + mail));
         userRepository.delete(user);
         log.info("User deleted successfully");
     }
@@ -160,7 +159,9 @@ public class UserService {
     @Transactional
     public TokenDto register(RegisterDto registerDto) {
         userRepository.findByMail(registerDto.getMail())
-            .ifPresent(user -> { throw new UserExistException(); });
+                .ifPresent(user -> {
+                    throw new UserExistException();
+                });
 
         validateRegisterFields(registerDto);
         log.info("Registering new user: {}", registerDto.getMail());
@@ -178,7 +179,7 @@ public class UserService {
     /**
      * Convert RegisterDto to User.
      *
-     * @param dto the registration DTO
+     * @param dto             the registration DTO
      * @param passwordEncoder the password encoder
      * @return the user entity
      */
@@ -192,7 +193,7 @@ public class UserService {
                 .build();
     }
 
-    //Validar campos de registro
+    // Validar campos de registro
     /**
      * Validate registration fields.
      *
@@ -200,35 +201,41 @@ public class UserService {
      * @throws InvalidTokenException if validation fails
      */
     public void validateRegisterFields(RegisterDto registerDto) {
-        
-            if (!registerDto.getMail().matches("^[\\w-\\.]+@[\\w-]+\\.[a-zA-Z]{2,}$")) {
-                throw new InvalidTokenException("Invalid email format");
-            }
-            if (registerDto.getBirthdate().isAfter(java.time.LocalDate.now().minusYears(18))) {
-                throw new InvalidTokenException("You must be at least 18 years old to update your profile");
-            }
-            if (registerDto.getPassword().length() < 8) {
-                throw new InvalidTokenException("Password must be at least 8 characters long");
-            }
-            if (!registerDto.getPassword().matches(".*[A-Z].*") || !registerDto.getPassword().matches(".*[a-z].*")
-                    || !registerDto.getPassword().matches(".*\\d.*")) {
-                throw new InvalidTokenException("Password must contain at least one uppercase letter, one lowercase letter, and one digit");
-            }
+
+        if (!registerDto.getMail().matches("^[\\w-\\.]+@[\\w-]+\\.[a-zA-Z]{2,}$")) {
+            throw new InvalidTokenException("Invalid email format");
+        }
+        if (registerDto.getBirthdate().isAfter(java.time.LocalDate.now().minusYears(18))) {
+            throw new InvalidTokenException("You must be at least 18 years old to update your profile");
+        }
+        if (registerDto.getPassword().length() < 8) {
+            throw new InvalidTokenException("Password must be at least 8 characters long");
+        }
+        if (!registerDto.getPassword().matches(".*[A-Z].*") || !registerDto.getPassword().matches(".*[a-z].*")
+                || !registerDto.getPassword().matches(".*\\d.*")) {
+            throw new InvalidTokenException(
+                    "Password must contain at least one uppercase letter, one lowercase letter, and one digit");
+        }
     }
+
     public void validateRegisterFields(UpdateUserDto updateUserDto) {
 
-            if (updateUserDto.getBirthday().toLocalDate().isAfter(java.time.LocalDate.now().minusYears(18))) {
-                throw new InvalidTokenException("You must be at least 18 years old to update your profile");
-            }
+        if (updateUserDto.getBirthday().toLocalDate().isAfter(java.time.LocalDate.now().minusYears(18))) {
+            throw new InvalidTokenException("You must be at least 18 years old to update your profile");
+        }
 
+        if (updateUserDto.getPassword() != null) {
             if (updateUserDto.getPassword().length() < 8) {
                 throw new InvalidTokenException("Password must be at least 8 characters long");
             }
             if (!updateUserDto.getPassword().matches(".*[A-Z].*") || !updateUserDto.getPassword().matches(".*[a-z].*")
                     || !updateUserDto.getPassword().matches(".*\\d.*")) {
-                throw new InvalidTokenException("Password must contain at least one uppercase letter, one lowercase letter, and one digit");
+                throw new InvalidTokenException(
+                        "Password must contain at least one uppercase letter, one lowercase letter, and one digit");
             }
+        }
     }
+
     /**
      * Get a user by email.
      *
@@ -240,8 +247,8 @@ public class UserService {
     public UserDto getByMail(String mail) {
         log.info("Getting user by email: {}", mail);
         return userRepository.findByMail(mail)
-            .map(this::toDto)
-            .orElseThrow(UserMailException::new);
+                .map(this::toDto)
+                .orElseThrow(UserMailException::new);
     }
 
     /**
@@ -259,5 +266,13 @@ public class UserService {
         dto.setBirthday(java.sql.Date.valueOf(user.getBirthdate()));
         dto.setCreateAt(java.sql.Date.valueOf(user.getCreatedAt()));
         return dto;
+    }
+
+    public UserDto getCurrentUser() {
+        String mail = securityUtils.getCurrentUser().getMail();
+        log.info("Getting current user by email: {}", mail);
+        return userRepository.findByMail(mail)
+                .map(this::toDto)
+                .orElseThrow(() -> new ResourceNotFoundException("Current user not found with email: " + mail));
     }
 }
