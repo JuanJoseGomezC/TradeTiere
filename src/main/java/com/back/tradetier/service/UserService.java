@@ -99,6 +99,10 @@ public class UserService {
             user.setLastname(updateDto.getLastname());
         }
 
+        if (updateDto.getBirthday() != null) {
+            user.setBirthdate(updateDto.getBirthday().toLocalDate());
+        }
+
         // si la contraseña esta vacía, no la actualiza
         if (updateDto.getPassword() != null && !updateDto.getPassword().isEmpty()) {
             user.setPassword(passwordEncoder.encode(updateDto.getPassword()));
