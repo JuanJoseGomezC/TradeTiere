@@ -10,6 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.back.tradetier.config.security.SecurityUtils;
 import com.back.tradetier.dto.AdvertismentDto;
 import com.back.tradetier.dto.ImageDto;
+import com.back.tradetier.dto.RaceDto;
+import com.back.tradetier.dto.SpecieDto;
 import com.back.tradetier.dto.UpdateAdvertismentDto;
 import com.back.tradetier.exceptions.AdvertismentNotFoundException;
 import com.back.tradetier.model.Advertisment;
@@ -66,6 +68,8 @@ public class AdvertismentService {
         log.info("Creating new advertisment: {}", advertismentDto.getTitle());
 
         Advertisment advertisment = toAdvertisment(advertismentDto);
+        // Set default values
+        advertisment.setState(true); // Default state is true
         Advertisment savedAdvertisment = advertismentRepository.save(advertisment);
 
         log.info("Advertisment saved successfully with id: {}", savedAdvertisment.getId());
@@ -119,69 +123,135 @@ public class AdvertismentService {
         log.info("Advertisment updated successfully");
         return updateDto; // Devolvemos el DTO de actualización ya que no es necesario convertir de nuevo
     }
+public Advertisment toAdvertisment(AdvertismentDto dto) {
+    User user = securityUtils.getCurrentUser();
 
-    public Advertisment toAdvertisment(AdvertismentDto dto) {
-        User user = securityUtils.getCurrentUser();
-        Image image = null;
-        if (dto.getImage() != null) {
-        
-        if (dto.getImage().getImageBase64() != null &&
-                !dto.getImage().getImageBase64().isEmpty()) {
-            // Convertir la cadena Base64 a bytes
-            byte[] imageData = Base64.getDecoder().decode(dto.getImage().getImageBase64());
+    // Imagen
+    Image image = null;
+    if (dto.getImage() != null && dto.getImage().getImageBase64() != null && !dto.getImage().getImageBase64().isEmpty()) {
+        byte[] imageData = Base64.getDecoder().decode(dto.getImage().getImageBase64());
 
-            image = Image.builder()
-                    .imageData(imageData)
-                    .name(dto.getImage().getName())
-                    .contentType(dto.getImage().getContentType())
-                    .build();
-        }
-    }
-        return Advertisment.builder()
-                .user(user)
-                .title(dto.getTitle())
-                .description(dto.getDescription())
-                .location(Location.builder()
-                        .id(dto.getLocation())
-                        .build())
-                .specie(Specie.builder()
-                        .id(dto.getSpecie())
-                        .build())
-                .race(Race.builder()
-                        .id(dto.getRace())
-                        .build())
-                .birthdate(dto.getBirthdate())
-                .language(Language.builder()
-                        .id(dto.getLanguage())
-                        .build())
-                .image(image)
-                .price(dto.getPrice())
-                .state(true)
-                .gender(dto.getGender())
+        image = Image.builder()
+                .imageData(imageData)
+                .name(dto.getImage().getName())
+                .contentType(dto.getImage().getContentType())
                 .build();
     }
 
-    public AdvertismentDto toDto(Advertisment advertisment) {
-        ImageDto imageDto = ImageDto.builder()
-                .imageBase64(advertisment.getImage() != null
-                        ? java.util.Base64.getEncoder().encodeToString(advertisment.getImage().getImageData())
-                        : null)
-                .name(advertisment.getImage() != null ? advertisment.getImage().getName() : null)
-                .contentType(advertisment.getImage() != null ? advertisment.getImage().getContentType() : null)
-                .build();
-
-        return AdvertismentDto.builder()
-                .title(advertisment.getTitle())
-                .description(advertisment.getDescription())
-                .location(advertisment.getLocation() != null ? advertisment.getLocation().getId() : null)
-                .specie(advertisment.getSpecie() != null ? advertisment.getSpecie().getId() : null)
-                .race(advertisment.getRace() != null ? advertisment.getRace().getId() : null)
-                .birthdate(advertisment.getBirthdate()) // Ya es java.sql.Date
-                .language(advertisment.getLanguage() != null ? advertisment.getLanguage().getId() : null)
-                .gender(advertisment.getGender())
-                .price(advertisment.getPrice())
-                .image(imageDto)
+    // Location
+    Location location = null;
+    if (dto.getLocation() != null) {
+        location = Location.builder()
+                .id(dto.getLocation())
                 .build();
     }
+
+    // Specie
+    Specie specie = null;
+    if (dto.getSpecie() != null) {
+        specie = Specie.builder()
+                .id(dto.getSpecie().getId())
+                .build();
+    }
+
+    // Race
+    Race race = null;
+    if (dto.getRace() != null) {
+        race = Race.builder()
+                .id(dto.getRace().getId())
+                .build();
+    }
+
+    // Language
+    Language language = null;
+    if (dto.getLanguage() != null) {
+        language = Language.builder()
+                .id(dto.getLanguage())
+                .build();
+    }
+
+    return Advertisment.builder()
+            .user(user)
+            .title(dto.getTitle())
+            .description(dto.getDescription())
+            .location(location)
+            .specie(specie)
+            .race(race)
+            .birthdate(dto.getBirthdate())
+            .language(language)
+            .image(image)
+            .price(dto.getPrice())
+            .state(dto.getState())
+            .gender(dto.getGender())
+            .build();
+}
+
+
+public AdvertismentDto toDto(Advertisment advertisment) {
+    // Imagen
+    ImageDto imageDto = null;
+    if (advertisment.getImage() != null) {
+        imageDto = ImageDto.builder()
+                .imageBase64(Base64.getEncoder().encodeToString(advertisment.getImage().getImageData()))
+                .name(advertisment.getImage().getName())
+                .contentType(advertisment.getImage().getContentType())
+                .build();
+    }
+
+    // Location
+    Integer locationId = advertisment.getLocation() != null ? advertisment.getLocation().getId() : null;
+
+    // Specie
+    SpecieDto specieDto = null;
+    if (advertisment.getSpecie() != null) {
+        Integer specieLanguageId = advertisment.getSpecie().getLanguage() != null
+                ? advertisment.getSpecie().getLanguage().getId()
+                : null;
+
+        specieDto = SpecieDto.builder()
+                .id(advertisment.getSpecie().getId())
+                .name(advertisment.getSpecie().getName())
+                .language(specieLanguageId)
+                .build();
+    }
+
+    // Race
+    RaceDto raceDto = null;
+    if (advertisment.getRace() != null) {
+        Integer raceLanguageId = advertisment.getRace().getLanguage() != null
+                ? advertisment.getRace().getLanguage().getId()
+                : null;
+
+        Integer raceSpecieId = advertisment.getRace().getSpecie() != null
+                ? advertisment.getRace().getSpecie().getId()
+                : null;
+
+        raceDto = RaceDto.builder()
+                .id(advertisment.getRace().getId())
+                .name(advertisment.getRace().getName())
+                .language(raceLanguageId)
+                .specie(raceSpecieId)
+                .build();
+    }
+
+    // Language
+    Integer languageId = advertisment.getLanguage() != null ? advertisment.getLanguage().getId() : null;
+
+    return AdvertismentDto.builder()
+            .id(advertisment.getId())
+            .title(advertisment.getTitle())
+            .description(advertisment.getDescription())
+            .location(locationId)
+            .specie(specieDto)
+            .race(raceDto)
+            .birthdate(advertisment.getBirthdate())
+            .language(languageId)
+            .gender(advertisment.getGender())
+            .price(advertisment.getPrice())
+            .image(imageDto)
+            .state(advertisment.getState())
+            .build();
+}
+
 
 }

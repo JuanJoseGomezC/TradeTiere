@@ -11,6 +11,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class AdvertismentDto {
+    Integer id;
     String title;
     String description;
     Integer location;
@@ -18,8 +19,8 @@ public class AdvertismentDto {
     Date birthdate;
     String gender;
     Float price;
-    Integer race;
-    Integer specie;
+    RaceDto race;
+    SpecieDto specie;
     Boolean state;
     LocalDate create_at;
     ImageDto image;
