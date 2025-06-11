@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.back.tradetier.config.security.SecurityUtils;
 import com.back.tradetier.dto.AdvertismentDto;
 import com.back.tradetier.dto.ImageDto;
+import com.back.tradetier.dto.LocationDto;
 import com.back.tradetier.dto.RaceDto;
 import com.back.tradetier.dto.SpecieDto;
 import com.back.tradetier.dto.UpdateAdvertismentDto;
@@ -142,7 +143,7 @@ public Advertisment toAdvertisment(AdvertismentDto dto) {
     Location location = null;
     if (dto.getLocation() != null) {
         location = Location.builder()
-                .id(dto.getLocation())
+                .id(dto.getLocation().getId())
                 .build();
     }
 
@@ -199,7 +200,19 @@ public AdvertismentDto toDto(Advertisment advertisment) {
     }
 
     // Location
-    Integer locationId = advertisment.getLocation() != null ? advertisment.getLocation().getId() : null;
+
+    LocationDto locationDto = null;
+    if (advertisment.getLocation() != null) {
+        Integer locationLanguageId = advertisment.getLocation().getLanguage() != null
+                ? advertisment.getLocation().getLanguage().getId()
+                : null;
+
+        locationDto = LocationDto.builder()
+                .id(advertisment.getLocation().getId())
+                .name(advertisment.getLocation().getName())
+                .language(locationLanguageId)
+                .build();
+    }
 
     // Specie
     SpecieDto specieDto = null;
@@ -241,7 +254,7 @@ public AdvertismentDto toDto(Advertisment advertisment) {
             .id(advertisment.getId())
             .title(advertisment.getTitle())
             .description(advertisment.getDescription())
-            .location(locationId)
+            .location(locationDto)
             .specie(specieDto)
             .race(raceDto)
             .birthdate(advertisment.getBirthdate())
@@ -250,6 +263,7 @@ public AdvertismentDto toDto(Advertisment advertisment) {
             .price(advertisment.getPrice())
             .image(imageDto)
             .state(advertisment.getState())
+            .userId(advertisment.getUser().getId())
             .build();
 }
 

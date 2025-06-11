@@ -224,7 +224,7 @@ public class UserService {
 
     public void validateRegisterFields(UpdateUserDto updateUserDto) {
 
-        if (updateUserDto.getBirthday().toLocalDate().isAfter(java.time.LocalDate.now().minusYears(18))) {
+        if (updateUserDto.getBirthday() != null && updateUserDto.getBirthday().toLocalDate().isAfter(java.time.LocalDate.now().minusYears(18))) {
             throw new InvalidTokenException("You must be at least 18 years old to update your profile");
         }
 

@@ -14,7 +14,7 @@ public class AdvertismentDto {
     Integer id;
     String title;
     String description;
-    Integer location;
+    LocationDto location;
     Integer language;
     Date birthdate;
     String gender;
@@ -24,4 +24,5 @@ public class AdvertismentDto {
     Boolean state;
     LocalDate create_at;
     ImageDto image;
+    Integer userId;
 }
