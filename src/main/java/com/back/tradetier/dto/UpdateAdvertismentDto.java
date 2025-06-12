@@ -29,4 +29,5 @@ public class UpdateAdvertismentDto {
 
     @Positive(message = "Price must be positive")
     private Double price;
+    private ImageDto image;
 }

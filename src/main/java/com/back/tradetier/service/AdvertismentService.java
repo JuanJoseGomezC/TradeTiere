@@ -120,6 +120,22 @@ public class AdvertismentService {
             existingAdvertisment.setPrice(updateDto.getPrice().floatValue());
         }
 
+        if(updateDto.getImage() != null){
+            // Procesar la imagen si se proporciona
+            if (updateDto.getImage().getImageBase64() != null && !updateDto.getImage().getImageBase64().isEmpty()) {
+                byte[] imageData = Base64.getDecoder().decode(updateDto.getImage().getImageBase64());
+                Image image = Image.builder()
+                        .imageData(imageData)
+                        .name(updateDto.getImage().getName())
+                        .contentType(updateDto.getImage().getContentType())
+                        .build();
+                existingAdvertisment.setImage(image);
+            } else {
+                // Si no se proporciona imagen, eliminar la imagen existente
+                existingAdvertisment.setImage(null);
+            }
+        }
+
         advertismentRepository.save(existingAdvertisment);
         log.info("Advertisment updated successfully");
         return updateDto; // Devolvemos el DTO de actualización ya que no es necesario convertir de nuevo
