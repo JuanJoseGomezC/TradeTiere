@@ -1,39 +1,38 @@
 package com.back.tradetier.model;
 
+import java.io.Serializable;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity(name = "Race")
-@Table(name = "\"Race\"", schema = "public")
+@Entity(name = "Image")
+@Table(name = "\"Image\"", schema = "public")
 @Data
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
-public class Race {
-
+@AllArgsConstructor
+public class Image implements Serializable {
     @Id
+    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
+
+    @Lob
+    @Column(name = "imageData", nullable = false)
+    private byte[] imageData;
 
     @Column(name = "name", nullable = false)
     private String name;
 
-
-    @ManyToOne
-    @JoinColumn(name = "language_id", nullable = false)
-    private Language language;
-
-    @ManyToOne
-    @JoinColumn(name = "specie_id", nullable = false)
-    private Specie specie;
+    @Column(name = "content_type", nullable = false)
+    private String contentType;
 }
